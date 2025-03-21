@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import { useTheme } from "@react-navigation/native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import ProgressBar from "@/components/ProgressBar";
 
 // Dados de transações
 const transactionsData = [
@@ -92,17 +93,19 @@ export default function HomeScreen() {
     <ScrollView style={[styles.container, { backgroundColor }]}>
       {/* Cabeçalho */}
       <View style={styles.header}>
-        <Text style={[styles.title, { color: colors.text }]}>Hi, João</Text>
+        <Text style={[styles.title, { color: colors.text }]}>Hi, kaliburiti</Text>
         <Text style={[styles.subtitle, { color: colors.text }]}>Bem-vindo de volta</Text>
       </View>
 
       {/* Cartão de Crédito */}
-      <View style={[styles.card, { backgroundColor: dark ? "#333" : "#fff" }]}>
+
+    <View style={[styles.card, { backgroundColor: dark ? `${activeColor}A1` : "#fff" }, { borderColor: dark ? activeColor : "#fff" }, { borderWidth: dark ? 1 : 0 }]}>
         <Text style={[styles.cardTitle, { color: colors.text }]}>Dinheiro Restante</Text>
         <Text style={[styles.cardValue, { color: colors.text }]}>
           R$ {availableMoney - spentThisWeek}
         </Text>
         <Text style={[styles.cardLabel, { color: colors.text }]}>Despesas desta semana</Text>
+        <ProgressBar progressValue={50}/>
         <Text style={[styles.cardMessage, { color: colors.text }]}>
           Você gastou {spentThisWeek} até agora. Fique atento ao orçamento.
         </Text>
