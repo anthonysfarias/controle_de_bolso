@@ -5,13 +5,13 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
+  ScrollView,
 } from "react-native";
 import { useTheme } from "@react-navigation/native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import DateTimePicker, {
-  DateTimePickerEvent,
-} from "@react-native-community/datetimepicker";
-import NumberFormat from "react-number-format"; // Biblioteca para formatação de números
+import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
+import { Picker } from "@react-native-picker/picker";
+import { Switch } from "react-native";
 
 const NovaTransacao = () => {
   const { colors, dark } = useTheme();
@@ -19,52 +19,48 @@ const NovaTransacao = () => {
   const [nota, setNota] = useState("");
   const [data, setData] = useState(new Date());
   const [mostrarData, setMostrarData] = useState(false);
+  const [opcaoSelecionada, setOpcaoSelecionada] = useState("");
+  const [categoriaDespesa, setCategoriaDespesa] = useState("");
+  const [metodoPagamento, setMetodoPagamento] = useState("");
+  const [parcelas, setParcelas] = useState("");
+  const [localDespesa, setLocalDespesa] = useState("");
+  const [tipoTransacao, setTipoTransacao] = useState("despesa");
+  const [localAtivo, setLocalAtivo] = useState(false);
 
   const corAtiva = dark ? "#ADF534" : "#FC4145";
   const corInativa = dark ? "#A1A1A1" : "#626262";
   const corBorda = dark ? "#444" : "#ddd";
 
-  const handleDateChange = (
-    event: DateTimePickerEvent,
-    selectedDate?: Date
-  ) => {
+  const handleDateChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
     const currentDate = selectedDate || data;
     setData(currentDate);
     setMostrarData(false);
   };
 
-  const formatarValor = (text) => {
-    // Removendo qualquer caractere não numérico
-    let valorFormatado = text.replace(/\D/g, "");
+  // Função para formatar valor com R$ e ponto para milhar, vírgula para centavos
+  const formatarValor = (text: string) => {
+    let valorNumerico = text.replace(/\D/g, "");
 
-    // Adicionando ponto como separador de milhar e vírgula como separador decimal
-    if (valorFormatado.length > 2) {
-      valorFormatado = valorFormatado.replace(
-        /(\d)(\d{2})$/,
-        "$1,$2"
-      );
+    if (!valorNumerico) {
+      return "";
     }
 
-    if (valorFormatado.length > 6) {
-      valorFormatado = valorFormatado.replace(
-        /(\d)(\d{3})(\d{3})$/,
-        "$1.$2,$3"
-      );
+    if (valorNumerico.length > 10) {
+      valorNumerico = valorNumerico.slice(0, 10);
     }
 
-    if (valorFormatado.length > 9) {
-      valorFormatado = valorFormatado.replace(
-        /(\d)(\d{3})(\d{3})(\d{3})$/,
-        "$1.$2.$3,$4"
-      );
-    }
+    let valorFormatado = Number(valorNumerico) / 100;
 
-    return valorFormatado;
+    return new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    }).format(valorFormatado).replace("R$", "").trim();
   };
 
   return (
-    <View
+    <ScrollView
       style={[styles.container, { backgroundColor: dark ? "#18181C" : "#fff" }]}
+      contentContainerStyle={{ paddingBottom: 50 }} // Garante que haja espaçamento no fundo
     >
       <View style={[styles.cabecalho]}>
         <Text style={[styles.titulo, { color: colors.text }]}>
@@ -73,34 +69,200 @@ const NovaTransacao = () => {
       </View>
 
       <View style={styles.switchContainer}>
-        <Text style={[styles.switchText, { color: colors.text }]}>
-          Despesas
-        </Text>
-        <Text style={[styles.switchText, { color: colors.text }]}>
-          Receitas
-        </Text>
+        <TouchableOpacity onPress={() => setTipoTransacao("despesa")}>
+          <Text
+            style={[
+              styles.switchText,
+              { color: tipoTransacao === "despesa" ? corAtiva : colors.text },
+              {
+                borderColor: tipoTransacao === "despesa" ? corAtiva : corInativa,
+                borderWidth: 1,
+              },
+            ]}
+          >
+            Despesas
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => setTipoTransacao("receita")}>
+          <Text
+            style={[
+              styles.switchText,
+              { color: tipoTransacao === "receita" ? corAtiva : colors.text },
+              {
+                borderColor: tipoTransacao === "receita" ? corAtiva : corInativa,
+                borderWidth: 1,
+              },
+            ]}
+          >
+            Receitas
+          </Text>
+        </TouchableOpacity>
       </View>
 
       <View style={styles.inputContainer}>
-        {/* Campo Valor com formatação de moeda */}
-        <View style={[styles.inputWrapper, { borderColor: corBorda }]}>
-          <Text style={[styles.currencySymbol, { color: colors.text }]}>
-            R$
-          </Text>
-          <TextInput
-            style={[
-              styles.inputCurrencySymbol,
-              { color: colors.text, borderColor: corBorda },
-            ]}
-            placeholder="0,00"
-            placeholderTextColor={corInativa}
-            keyboardType="numeric"
-            value={valor}
-            onChangeText={(text) => setValor(formatarValor(text))}
-            onBlur={() => setValor(formatarValor(valor))} // Formatar quando perder o foco
-          />
-        </View>
+        {/* Se for Despesa */}
+        {tipoTransacao === "despesa" && (
+          <>
+            <Text style={[styles.inputLabel, { color: colors.text }]}>
+              Despesa
+            </Text>
+            <View style={[styles.inputWrapper, { borderColor: corBorda }]}>
+              <Text style={[styles.currencySymbol, { color: colors.text }]}>
+                R$
+              </Text>
+              <TextInput
+                style={[
+                  styles.inputCurrencySymbol,
+                  { color: colors.text, borderColor: corBorda },
+                ]}
+                placeholder="0,00"
+                placeholderTextColor={corInativa}
+                keyboardType="numeric"
+                value={valor}
+                onChangeText={(text) => setValor(formatarValor(text))}
+                onBlur={() => setValor(formatarValor(valor))}
+              />
+            </View>
 
+            {/* Categoria de Despesa */}
+            <Text style={[styles.inputLabel, { color: colors.text }]}>
+              Categoria de Despesa
+            </Text>
+            <View style={[styles.inputWrapper, { borderColor: corBorda }]}>
+              <Picker
+                selectedValue={categoriaDespesa}
+                onValueChange={(itemValue: string) => setCategoriaDespesa(itemValue)}
+                style={[styles.picker, { color: colors.text }]}
+                dropdownIconColor={colors.text}
+              >
+                <Picker.Item label="Selecione a categoria" value="" />
+                <Picker.Item label="Alimentação" value="alimentacao" />
+                <Picker.Item label="Moradia" value="moradia" />
+                <Picker.Item label="Transporte" value="transporte" />
+                <Picker.Item label="Saúde" value="saude" />
+                <Picker.Item label="Lazer" value="lazer" />
+                <Picker.Item label="Educação" value="educacao" />
+                <Picker.Item label="Outros" value="outros" />
+              </Picker>
+            </View>
+
+            {/* Método de Pagamento */}
+            <Text style={[styles.inputLabel, { color: colors.text }]}>
+              Método de Pagamento
+            </Text>
+            <View style={[styles.inputWrapper, { borderColor: corBorda }]}>
+              <Picker
+                selectedValue={metodoPagamento}
+                onValueChange={(itemValue: string) => setMetodoPagamento(itemValue)}
+                style={[styles.picker, { color: colors.text }]}
+                dropdownIconColor={colors.text}
+              >
+                <Picker.Item label="Selecione o método de pagamento" value="" />
+                <Picker.Item label="Cartão de Crédito" value="credito" />
+                <Picker.Item label="Cartão de Débito" value="debito" />
+                <Picker.Item label="Transferência" value="transferencia" />
+                <Picker.Item label="Dinheiro" value="dinheiro" />
+                <Picker.Item label="Cheque" value="cheque" />
+              </Picker>
+            </View>
+
+          {/* Parcelamento */}
+{metodoPagamento === "credito" && (
+  <>
+    <Text style={[styles.inputLabel, { color: colors.text }]}>
+      Parcelas
+    </Text>
+    <View style={[styles.inputWrapper, { borderColor: corBorda }]}>
+      <Picker
+        selectedValue={parcelas}
+        onValueChange={(itemValue: string) => setParcelas(itemValue)}
+        style={[styles.picker, { color: colors.text }]}
+        dropdownIconColor={colors.text}
+      >
+        <Picker.Item label="Selecione o número de parcelas" value="" />
+        {/* Gerar as opções de 1 a 240 */}
+        {Array.from({ length: 240 }, (_, index) => (
+          <Picker.Item
+            key={index + 1}
+            label={`x${index + 1}`}
+            value={`${index + 1}`}
+          />
+        ))}
+      </Picker>
+    </View>
+  </>
+)}
+
+
+            {/* Local da Despesa */}
+            <View style={styles.localDespesaContainer}>
+              <Text style={[styles.inputLabel, { color: colors.text }]}>
+                Local ou Estabelecimento
+              </Text>
+              <Switch
+                value={localAtivo}
+                onValueChange={setLocalAtivo}
+                trackColor={{ false: corInativa, true: corAtiva }}
+                thumbColor={localAtivo ? corAtiva : corInativa}
+              />
+            </View>
+            {localAtivo && (
+              <TextInput
+                style={[styles.input, { color: colors.text, borderColor: corBorda }]}
+                placeholder="Onde foi realizada?"
+                placeholderTextColor={corInativa}
+                value={localDespesa}
+                onChangeText={setLocalDespesa}
+              />
+            )}
+          </>
+        )}
+
+        {/* Se for Receita */}
+        {tipoTransacao === "receita" && (
+          <>
+            <Text style={[styles.inputLabel, { color: colors.text }]}>
+              Receita
+            </Text>
+            <View style={[styles.inputWrapper, { borderColor: corBorda }]}>
+              <Text style={[styles.currencySymbol, { color: colors.text }]}>
+                R$
+              </Text>
+              <TextInput
+                style={[
+                  styles.inputCurrencySymbol,
+                  { color: colors.text, borderColor: corBorda },
+                ]}
+                placeholder="0,00"
+                placeholderTextColor={corInativa}
+                keyboardType="numeric"
+                value={valor}
+                onChangeText={(text) => setValor(formatarValor(text))}
+                onBlur={() => setValor(formatarValor(valor))}
+              />
+            </View>
+
+            {/* Categoria de Receita */}
+            <Text style={[styles.inputLabel, { color: colors.text }]}>
+              Categoria de Receita
+            </Text>
+            <View style={[styles.inputWrapper, { borderColor: corBorda }]}>
+              <Picker
+                selectedValue={categoriaDespesa}
+                onValueChange={(itemValue: string) => setCategoriaDespesa(itemValue)}
+                style={[styles.picker, { color: colors.text }]}
+                dropdownIconColor={colors.text}
+              >
+                <Picker.Item label="Selecione a categoria" value="" />
+                <Picker.Item label="Salário" value="salario" />
+                <Picker.Item label="Investimentos" value="investimentos" />
+                <Picker.Item label="Outros" value="outros" />
+              </Picker>
+            </View>
+          </>
+        )}
+
+        {/* Nota */}
         <TextInput
           style={[styles.input, { color: colors.text, borderColor: corBorda }]}
           placeholder="Nota"
@@ -109,6 +271,7 @@ const NovaTransacao = () => {
           onChangeText={setNota}
         />
 
+        {/* Data de Transação */}
         <TouchableOpacity
           onPress={() => setMostrarData(true)}
           style={[styles.datePicker, { borderColor: corBorda }]}
@@ -131,13 +294,6 @@ const NovaTransacao = () => {
             onChange={handleDateChange}
           />
         )}
-
-        <TouchableOpacity
-          style={[styles.uploadButton, { borderColor: corBorda }]}
-        >
-          <MaterialCommunityIcons name="camera" size={24} color={colors.text} />
-          <Text style={{ color: colors.text }}>Upload mídia</Text>
-        </TouchableOpacity>
       </View>
 
       <TouchableOpacity
@@ -150,7 +306,7 @@ const NovaTransacao = () => {
       >
         <Text style={styles.saveButtonText}>Salvar</Text>
       </TouchableOpacity>
-    </View>
+    </ScrollView>
   );
 };
 
@@ -175,6 +331,10 @@ const styles = StyleSheet.create({
   },
   switchText: {
     fontSize: 16,
+    paddingHorizontal: 45,
+    paddingVertical: 10,
+    borderWidth: 1,
+    borderRadius: 8,
   },
   inputContainer: {
     marginBottom: 24,
@@ -189,10 +349,8 @@ const styles = StyleSheet.create({
   currencySymbol: {
     marginLeft: 16,
     fontSize: 18,
-    fontWeight: "bold",
   },
   inputCurrencySymbol: {
-    fontWeight: "bold",
     paddingLeft: 15,
     fontSize: 16,
     flex: 1,
@@ -205,6 +363,11 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     fontSize: 16,
   },
+  inputLabel: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginBottom: 8,
+  },
   datePicker: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -214,15 +377,9 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 16,
   },
-  uploadButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderWidth: 1,
-    borderRadius: 8,
-    justifyContent: "center",
-    marginBottom: 16,
+  picker: {
+    height: 50,
+    width: "100%",
   },
   saveButton: {
     paddingVertical: 16,
@@ -230,12 +387,17 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: "center",
     justifyContent: "center",
-    elevation: 3,
+    marginBottom: 100,
   },
   saveButtonText: {
     color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
+  },
+  localDespesaContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
 });
 
