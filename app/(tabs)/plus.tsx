@@ -9,7 +9,9 @@ import {
 } from "react-native";
 import { useTheme } from "@react-navigation/native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
+import DateTimePicker, {
+  DateTimePickerEvent,
+} from "@react-native-community/datetimepicker";
 import { Picker } from "@react-native-picker/picker";
 import { Switch } from "react-native";
 
@@ -31,7 +33,10 @@ const NovaTransacao = () => {
   const corInativa = dark ? "#A1A1A1" : "#626262";
   const corBorda = dark ? "#444" : "#ddd";
 
-  const handleDateChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
+  const handleDateChange = (
+    event: DateTimePickerEvent,
+    selectedDate?: Date
+  ) => {
     const currentDate = selectedDate || data;
     setData(currentDate);
     setMostrarData(false);
@@ -54,7 +59,10 @@ const NovaTransacao = () => {
     return new Intl.NumberFormat("pt-BR", {
       style: "currency",
       currency: "BRL",
-    }).format(valorFormatado).replace("R$", "").trim();
+    })
+      .format(valorFormatado)
+      .replace("R$", "")
+      .trim();
   };
 
   return (
@@ -75,7 +83,8 @@ const NovaTransacao = () => {
               styles.switchText,
               { color: tipoTransacao === "despesa" ? corAtiva : colors.text },
               {
-                borderColor: tipoTransacao === "despesa" ? corAtiva : corInativa,
+                borderColor:
+                  tipoTransacao === "despesa" ? corAtiva : corInativa,
                 borderWidth: 1,
               },
             ]}
@@ -89,7 +98,8 @@ const NovaTransacao = () => {
               styles.switchText,
               { color: tipoTransacao === "receita" ? corAtiva : colors.text },
               {
-                borderColor: tipoTransacao === "receita" ? corAtiva : corInativa,
+                borderColor:
+                  tipoTransacao === "receita" ? corAtiva : corInativa,
                 borderWidth: 1,
               },
             ]}
@@ -131,7 +141,9 @@ const NovaTransacao = () => {
             <View style={[styles.inputWrapper, { borderColor: corBorda }]}>
               <Picker
                 selectedValue={categoriaDespesa}
-                onValueChange={(itemValue: string) => setCategoriaDespesa(itemValue)}
+                onValueChange={(itemValue: string) =>
+                  setCategoriaDespesa(itemValue)
+                }
                 style={[styles.picker, { color: colors.text }]}
                 dropdownIconColor={colors.text}
               >
@@ -153,7 +165,9 @@ const NovaTransacao = () => {
             <View style={[styles.inputWrapper, { borderColor: corBorda }]}>
               <Picker
                 selectedValue={metodoPagamento}
-                onValueChange={(itemValue: string) => setMetodoPagamento(itemValue)}
+                onValueChange={(itemValue: string) =>
+                  setMetodoPagamento(itemValue)
+                }
                 style={[styles.picker, { color: colors.text }]}
                 dropdownIconColor={colors.text}
               >
@@ -166,33 +180,37 @@ const NovaTransacao = () => {
               </Picker>
             </View>
 
-          {/* Parcelamento */}
-{metodoPagamento === "credito" && (
-  <>
-    <Text style={[styles.inputLabel, { color: colors.text }]}>
-      Parcelas
-    </Text>
-    <View style={[styles.inputWrapper, { borderColor: corBorda }]}>
-      <Picker
-        selectedValue={parcelas}
-        onValueChange={(itemValue: string) => setParcelas(itemValue)}
-        style={[styles.picker, { color: colors.text }]}
-        dropdownIconColor={colors.text}
-      >
-        <Picker.Item label="Selecione o número de parcelas" value="" />
-        {/* Gerar as opções de 1 a 240 */}
-        {Array.from({ length: 240 }, (_, index) => (
-          <Picker.Item
-            key={index + 1}
-            label={`x${index + 1}`}
-            value={`${index + 1}`}
-          />
-        ))}
-      </Picker>
-    </View>
-  </>
-)}
-
+            {/* Parcelamento */}
+            {metodoPagamento === "credito" && (
+              <>
+                <Text style={[styles.inputLabel, { color: colors.text }]}>
+                  Parcelas
+                </Text>
+                <View style={[styles.inputWrapper, { borderColor: corBorda }]}>
+                  <Picker
+                    selectedValue={parcelas}
+                    onValueChange={(itemValue: string) =>
+                      setParcelas(itemValue)
+                    }
+                    style={[styles.picker, { color: colors.text }]}
+                    dropdownIconColor={colors.text}
+                  >
+                    <Picker.Item
+                      label="Selecione o número de parcelas"
+                      value=""
+                    />
+                    {/* Gerar as opções de 1 a 240 */}
+                    {Array.from({ length: 240 }, (_, index) => (
+                      <Picker.Item
+                        key={index + 1}
+                        label={`x${index + 1}`}
+                        value={`${index + 1}`}
+                      />
+                    ))}
+                  </Picker>
+                </View>
+              </>
+            )}
 
             {/* Local da Despesa */}
             <View style={styles.localDespesaContainer}>
@@ -208,7 +226,10 @@ const NovaTransacao = () => {
             </View>
             {localAtivo && (
               <TextInput
-                style={[styles.input, { color: colors.text, borderColor: corBorda }]}
+                style={[
+                  styles.input,
+                  { color: colors.text, borderColor: corBorda },
+                ]}
                 placeholder="Onde foi realizada?"
                 placeholderTextColor={corInativa}
                 value={localDespesa}
@@ -249,7 +270,9 @@ const NovaTransacao = () => {
             <View style={[styles.inputWrapper, { borderColor: corBorda }]}>
               <Picker
                 selectedValue={categoriaDespesa}
-                onValueChange={(itemValue: string) => setCategoriaDespesa(itemValue)}
+                onValueChange={(itemValue: string) =>
+                  setCategoriaDespesa(itemValue)
+                }
                 style={[styles.picker, { color: colors.text }]}
                 dropdownIconColor={colors.text}
               >
