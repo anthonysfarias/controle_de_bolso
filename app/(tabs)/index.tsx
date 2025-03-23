@@ -5,168 +5,335 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  Animated,
 } from "react-native";
 import { useTheme } from "@react-navigation/native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import ProgressBar from "@/components/ProgressBar";
+import {
+  BotaoFiltroProps,
+  CartaoTransacaoProps,
+  Transacao,
+} from "../interfaces/indexTypes";
 
 // Dados de transações
-const transactionsData = [
-  { id: "1", icon: "food", title: "Almoço", date: "15/03/2025", value: "R$ 25,00", category: "Alimentação" },
-  { id: "2", icon: "car", title: "Gasolina", date: "16/03/2025", value: "R$ 50,00", category: "Transporte" },
-  { id: "3", icon: "gamepad", title: "Jogo", date: "17/03/2025", value: "R$ 60,00", category: "Entretenimento" },
-  { id: "4", icon: "repeat", title: "Luz", date: "18/03/2025", value: "R$ 100,00", category: "Casa" },
-  { id: "5", icon: "wallet", title: "Água", date: "19/03/2025", value: "R$ 40,00", category: "Casa" },
-  { id: "6", icon: "account", title: "Internet", date: "20/03/2025", value: "R$ 120,00", category: "Casa" },
-  { id: "7", icon: "food", title: "Janta", date: "15/03/2025", value: "R$ 27,00", category: "Alimentação" },
+const dadosTransacoes: Transacao[] = [
+  {
+    id: "1",
+    icone: "food",
+    titulo: "Almoço",
+    data: "15/03/2025",
+    valor: "-R$ 25,00",
+    categoria: "Alimentação",
+    tipo: "saida",
+  },
+  {
+    id: "2",
+    icone: "car",
+    titulo: "Gasolina",
+    data: "16/03/2025",
+    valor: "R$ 50,00",
+    categoria: "Transporte",
+    tipo: "entrada",
+  },
+  {
+    id: "3",
+    icone: "gamepad",
+    titulo: "Jogo",
+    data: "17/03/2025",
+    valor: "-R$ 60,00",
+    categoria: "Entretenimento",
+    tipo: "saida",
+  },
+  {
+    id: "4",
+    icone: "home",
+    titulo: "Luz",
+    data: "18/03/2025",
+    valor: "R$ 100,00",
+    categoria: "Casa",
+    tipo: "entrada",
+  },
+  {
+    id: "5",
+    icone: "home",
+    titulo: "Água",
+    data: "19/03/2025",
+    valor: "R$ 40,00",
+    categoria: "Casa",
+    tipo: "entrada",
+  },
+  {
+    id: "6",
+    icone: "account",
+    titulo: "Internet",
+    data: "20/03/2025",
+    valor: "-R$ 120,00",
+    categoria: "Casa",
+    tipo: "saida",
+  },
+  {
+    id: "7",
+    icone: "food",
+    titulo: "Janta",
+    data: "15/03/2025",
+    valor: "-R$ 27,00",
+    categoria: "Alimentação",
+    tipo: "saida",
+  },
+  {
+    id: "8",
+    icone: "hospital-building",
+    titulo: "Consulta médica",
+    data: "21/03/2025",
+    valor: "-R$ 150,00",
+    categoria: "Saúde",
+    tipo: "saida",
+  },
+  {
+    id: "9",
+    icone: "school",
+    titulo: "Matrícula escolar",
+    data: "22/03/2025",
+    valor: "-R$ 500,00",
+    categoria: "Educação",
+    tipo: "saida",
+  },
+  {
+    id: "10",
+    icone: "cake",
+    titulo: "Festa de aniversário",
+    data: "23/03/2025",
+    valor: "-R$ 200,00",
+    categoria: "Lazer",
+    tipo: "saida",
+  },
+  {
+    id: "11",
+    icone: "airplane",
+    titulo: "Passagem aérea",
+    data: "24/03/2025",
+    valor: "-R$ 1200,00",
+    categoria: "Viagem",
+    tipo: "saida",
+  },
+  {
+    id: "12",
+    icone: "package",
+    titulo: "Compra online",
+    data: "25/03/2025",
+    valor: "-R$ 100,00",
+    categoria: "Outros",
+    tipo: "saida",
+  },
 ];
 
-// Ícones definidos
-const icons = {
-  food: "food",
-  car: "car",
-  gamepad: "gamepad",
-  repeat: "repeat",
-  wallet: "wallet",
-  account: "account",
-};
+// Componente do botão de filtro
+const BotaoFiltro = ({ label, dark, active, onPress }: BotaoFiltroProps) => {
+  const corAtiva = dark ? "#ADF534" : "#FC4145";
+  const corInativa = dark ? "#A1A1A1" : "#626262";
 
-type MaterialIcons = keyof typeof icons;
-
-const FilterButton = ({ label, active, onPress }: { label: string, active: boolean, onPress: () => void }) => {
-  const { colors } = useTheme();
-  const activeColor = "#EF6C04";
-  const inactiveColor = "#626262";
-  
   return (
-    <TouchableOpacity style={styles.filter} onPress={onPress}>
-      <Text style={{ color: active ? activeColor : inactiveColor }}>{label}</Text>
+    <TouchableOpacity style={estilos.filtro} onPress={onPress}>
+      <Text style={{ color: active ? corAtiva : corInativa }}>{label}</Text>
     </TouchableOpacity>
   );
 };
 
-const TransactionCard = ({ item, activeColor, dark }: { item: typeof transactionsData[0], activeColor: string, dark: boolean }) => {
+// Componente do cartão de transação
+const CartaoTransacao = ({ item, corAtiva, escuro }: CartaoTransacaoProps) => {
   const { colors } = useTheme();
 
-  // Certifique-se de que o ícone esteja tipado corretamente
-  const iconName = item.icon as MaterialIcons;
+  // Usando diretamente o nome do ícone em vez de tentar acessar uma variável externa
+  const nomeIcone = item.icone; // "food", "car", "gamepad", etc.
+
+  // Verificando se é uma entrada ou saída e formatando a cor do valor
+  const isEntrada = item.tipo === "entrada";
+  const corValor = isEntrada ? "#28a745" : "#dc3545"; // verde para entrada, vermelho para saída
 
   return (
-    <View style={[styles.transactionCard, { backgroundColor: dark ? "#333" : "#fff" }]}>
+    <View
+      style={[
+        estilos.cartaoTransacao,
+        { backgroundColor: escuro ? "#18181C" : "#c3c3c31A" },
+      ]}
+    >
+      {/* Usando o nome do ícone diretamente */}
       <MaterialCommunityIcons
-        name={iconName}
+        name={nomeIcone} // "food", "car", etc.
         size={24}
-        color={activeColor}
-        style={styles.icon}
+        color={corAtiva}
+        style={estilos.icone}
       />
-      <View style={styles.transactionDetails}>
-        <Text style={[styles.transactionTitle, { color: colors.text }]}>{item.title}</Text>
-        <Text style={[styles.transactionDate, { color: colors.text }]}>{item.date}</Text>
+      <View style={estilos.detalhesTransacao}>
+        <Text style={[estilos.tituloTransacao, { color: colors.text }]}>
+          {item.titulo}
+        </Text>
+        <Text style={[estilos.dataTransacao, { color: colors.text }]}>
+          {item.data}
+        </Text>
       </View>
-      <Text style={[styles.transactionValue, { color: colors.text }]}>{item.value}</Text>
+      <Text style={[estilos.valorTransacao, { color: corValor }]}>
+        {item.valor}
+      </Text>
     </View>
   );
 };
 
-export default function HomeScreen() {
+// Componente principal da tela
+const TelaInicial: React.FC = () => {
   const { colors, dark } = useTheme();
-  const availableMoney = 200;
-  const spentThisWeek = 135;
+  const dinheiroDisponivel = 200;
+  const gastoEstaSemana = 135;
 
-  const [visibleItems, setVisibleItems] = useState(3); // Número de itens visíveis inicialmente
-  const [showAll, setShowAll] = useState(false); // Controle do estado do botão
-  const [selectedFilter, setSelectedFilter] = useState<string>("Todos"); // Filtro selecionado
+  const [itensVisiveis, setItensVisiveis] = useState<number>(3); // Tipagem para número de itens visíveis
+  const [mostrarTodos, setMostrarTodos] = useState<boolean>(false); // Tipagem para controle do "Ver mais"
+  const [filtroSelecionado, setFiltroSelecionado] = useState<string>("Todos"); // Tipagem para filtro de categoria
 
-  const backgroundColor = dark ? "#121212" : "#fff";
-  const activeColor = "#EF6C04";
+  const corDeFundo = dark ? "#000002" : "#fff";
+  const corAtiva = dark ? "#ADF534" : "#FC4145";
 
-  const toggleVisibility = () => {
-    setVisibleItems(showAll ? 3 : transactionsData.length); // Alterna entre "Ver mais" e "Ver menos"
-    setShowAll(!showAll);
+  const alternarVisibilidade = () => {
+    setItensVisiveis(mostrarTodos ? 3 : dadosTransacoes.length); // Alterna entre "Ver mais" e "Ver menos"
+    setMostrarTodos(!mostrarTodos);
   };
 
-  const filteredTransactions = transactionsData.filter(
-    (item) => selectedFilter === "Todos" || item.category === selectedFilter
+  // Filtrando as transações com base no filtro selecionado
+  const transacoesFiltradas: Transacao[] = dadosTransacoes.filter(
+    (item) =>
+      filtroSelecionado === "Todos" || item.categoria === filtroSelecionado
   );
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor }]}>
+    <ScrollView style={[estilos.container, { backgroundColor: corDeFundo }]}>
       {/* Cabeçalho */}
-      <View style={styles.header}>
-        <Text style={[styles.title, { color: colors.text }]}>Hi, kaliburiti</Text>
-        <Text style={[styles.subtitle, { color: colors.text }]}>Bem-vindo de volta</Text>
+      <View style={estilos.cabecalho}>
+        <Text style={[estilos.titulo, { color: colors.text }]}>
+          Olá, kaliburiti
+        </Text>
+        <Text style={[estilos.subtitulo, { color: colors.text }]}>
+          Bem-vindo de volta
+        </Text>
       </View>
 
       {/* Cartão de Crédito */}
-
-    <View style={[styles.card, { backgroundColor: dark ? `${activeColor}A1` : "#fff" }, { borderColor: dark ? activeColor : "#fff" }, { borderWidth: dark ? 1 : 0 }]}>
-        <Text style={[styles.cardTitle, { color: colors.text }]}>Dinheiro Restante</Text>
-        <Text style={[styles.cardValue, { color: colors.text }]}>
-          R$ {availableMoney - spentThisWeek}
+      <View
+        style={[
+          estilos.cartao,
+          { backgroundColor: dark ? `${corAtiva}A1` : `${corAtiva}66` },
+          { borderColor: dark ? corAtiva : corAtiva },
+          { borderWidth: 1 },
+        ]}
+      >
+        <Text style={[estilos.tituloCartao, { color: colors.text }]}>
+          Dinheiro Restante
         </Text>
-        <Text style={[styles.cardLabel, { color: colors.text }]}>Despesas desta semana</Text>
-        <ProgressBar progressValue={50}/>
-        <Text style={[styles.cardMessage, { color: colors.text }]}>
-          Você gastou {spentThisWeek} até agora. Fique atento ao orçamento.
+        <Text style={[estilos.valorCartao, { color: colors.text }]}>
+          R$ {dinheiroDisponivel - gastoEstaSemana}
+        </Text>
+        <Text style={[estilos.rotuloCartao, { color: colors.text }]}>
+          Despesas desta semana
+        </Text>
+        <ProgressBar progressValue={20} />
+        <Text style={[estilos.mensagemCartao, { color: colors.text }]}>
+          Você gastou {gastoEstaSemana} até agora. Fique atento ao orçamento.
         </Text>
       </View>
 
       {/* Lista de Transações */}
-      <View style={styles.transactionList}>
-        <View style={styles.transactionListHeader}>
-          <Text style={[styles.transactionListTitle, { color: colors.text }]}>Lista de Transações</Text>
-          <TouchableOpacity onPress={toggleVisibility}>
-            <Text style={[styles.viewMore, { color: activeColor }]}>
-              {showAll ? "Ver menos" : "Ver mais"}
+      <View style={estilos.listaTransacoes}>
+        <View style={estilos.cabecalhoListaTransacoes}>
+          <Text style={[estilos.tituloListaTransacoes, { color: colors.text }]}>
+            Lista de Transações
+          </Text>
+          <TouchableOpacity onPress={alternarVisibilidade}>
+            <Text style={[estilos.verMais, { color: corAtiva }]}>
+              {mostrarTodos ? "Ver menos" : "Ver mais"}
             </Text>
           </TouchableOpacity>
         </View>
       </View>
 
-      {/* Filtros */}
-      <View style={styles.filters}>
-        {["Todos", "Alimentação", "Transporte", "Entretenimento", "Casa"].map((category) => (
-          <FilterButton
-            key={category}
-            label={category}
-            active={selectedFilter === category}
-            onPress={() => setSelectedFilter(category)}
-          />
-        ))}
+      <View style={estilos.filtros}>
+        <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
+          {[
+            "Todos",
+            "Alimentação",
+            "Transporte",
+            "Entretenimento",
+            "Casa",
+            "Saúde",
+            "Educação",
+            "Lazer",
+            "Viagem",
+            "Outros",
+          ].map((categoria) => (
+            <BotaoFiltro
+              key={categoria}
+              label={categoria}
+              dark={dark}
+              active={filtroSelecionado === categoria}
+              onPress={() => setFiltroSelecionado(categoria)}
+            />
+          ))}
+        </ScrollView>
       </View>
 
       {/* Cards de Transações */}
-      {filteredTransactions.slice(0, visibleItems).map((item) => (
-        <TransactionCard key={item.id} item={item} activeColor={activeColor} dark={dark} />
+      {transacoesFiltradas.slice(0, itensVisiveis).map((item) => (
+        <CartaoTransacao
+          key={item.id}
+          item={item}
+          corAtiva={corAtiva}
+          escuro={dark}
+        />
       ))}
     </ScrollView>
   );
-}
+};
 
-const styles = StyleSheet.create({
+// Estilos do aplicativo
+const estilos = StyleSheet.create({
   container: { flex: 1, padding: 16 },
-  header: { marginTop: 50, marginBottom: 24 },
-  title: { fontSize: 24, fontWeight: "bold" },
-  subtitle: { fontSize: 16 },
-  card: { padding: 16, borderRadius: 8, marginBottom: 24 },
-  cardTitle: { fontSize: 18, fontWeight: "bold" },
-  cardValue: { fontSize: 24, fontWeight: "bold", marginVertical: 8 },
-  cardLabel: { fontSize: 14 },
-  cardMessage: { fontSize: 14, marginTop: 8 },
-  transactionList: { marginBottom: 16 },
-  transactionListHeader: {
+  cabecalho: { marginTop: 50, marginBottom: 24 },
+  titulo: { fontSize: 24, fontWeight: "bold" },
+  subtitulo: { fontSize: 16 },
+  cartao: { padding: 16, borderRadius: 8, marginBottom: 24 },
+  tituloCartao: { fontSize: 18, fontWeight: "bold" },
+  valorCartao: { fontSize: 24, fontWeight: "bold", marginVertical: 8 },
+  rotuloCartao: { fontSize: 14 },
+  mensagemCartao: { fontSize: 14, marginTop: 8 },
+  listaTransacoes: { marginBottom: 16 },
+  cabecalhoListaTransacoes: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
   },
-  transactionListTitle: { fontSize: 18, fontWeight: "bold" },
-  viewMore: { fontSize: 14, textAlign: "right" },
-  filters: { flexDirection: "row", justifyContent: "space-between", marginTop: 8 },
-  filter: { fontSize: 14, marginBottom: 16 },
-  transactionCard: { flexDirection: "row", alignItems: "center", padding: 16, borderRadius: 8, marginBottom: 8 },
-  icon: { fontSize: 24, marginRight: 16 },
-  transactionDetails: { flex: 1 },
-  transactionTitle: { fontSize: 16, fontWeight: "bold" },
-  transactionDate: { fontSize: 12, color: "gray" },
-  transactionValue: { fontSize: 16, fontWeight: "bold" },
+  tituloListaTransacoes: { fontSize: 18, fontWeight: "bold" },
+  verMais: { fontSize: 14, textAlign: "right" },
+
+  filtros: {
+    flexDirection: "row",
+    marginTop: 8,
+    paddingHorizontal: 8, // Adicionando algum espaço nas laterais
+  },
+  filtro: {
+    fontSize: 14,
+    marginRight: 12, // Ajuste no espaçamento entre os filtros
+    marginBottom: 16, // Espaçamento entre filtros e a próxima linha de conteúdo
+  },
+  cartaoTransacao: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 16,
+    borderRadius: 8,
+    marginBottom: 8,
+  },
+  icone: { fontSize: 24, marginRight: 16 },
+  detalhesTransacao: { flex: 1 },
+  tituloTransacao: { fontSize: 16, fontWeight: "bold" },
+  dataTransacao: { fontSize: 12, color: "gray" },
+  valorTransacao: { fontSize: 16, fontWeight: "bold" },
 });
+
+export default TelaInicial;

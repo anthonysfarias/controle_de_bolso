@@ -1,74 +1,146 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+} from "react-native";
+import { useTheme } from "@react-navigation/native";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import DateTimePicker from '@react-native-community/datetimepicker';
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+const NovaTransacao = () => {
+  const { colors, dark } = useTheme();
+  const [valor, setValor] = useState("");
+  const [nota, setNota] = useState("");
+  const [data, setData] = useState(new Date()); // Estado para data
+  const [mostrarData, setMostrarData] = useState(false); // Controle da visibilidade do DatePicker
 
-export default function HomeScreen() {
+  const handleDateChange = (event, selectedDate) => {
+    const currentDate = selectedDate || data;
+    setData(currentDate);
+    setMostrarData(false);
+  };
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
+    <View
+      style={[styles.container, { backgroundColor: dark ? "#18181C" : "#fff" }]}
+    >
+      <Text style={[styles.titulo, { color: colors.text }]}>Nova Transação</Text>
+      
+      <View style={styles.switchContainer}>
+        <Text style={[styles.switchText, { color: colors.text }]}>Despesas</Text>
+        <Text style={[styles.switchText, { color: colors.text }]}>Receitas</Text>
+      </View>
+      
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={styles.input}
+          placeholder="$"
+          keyboardType="numeric"
+          value={valor}
+          onChangeText={setValor}
         />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12'
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+        
+        <TextInput
+          style={styles.input}
+          placeholder="Nota"
+          value={nota}
+          onChangeText={setNota}
+        />
+
+        <TouchableOpacity
+          onPress={() => setMostrarData(true)}
+          style={styles.datePicker}
+        >
+          <Text style={{ color: colors.text }}>
+            {data.toLocaleDateString()}
+          </Text>
+          <MaterialCommunityIcons name="calendar" size={24} color={colors.text} />
+        </TouchableOpacity>
+
+        {mostrarData && (
+          <DateTimePicker
+            value={data}
+            mode="date"
+            display="default"
+            onChange={handleDateChange}
+          />
+        )}
+
+        <TouchableOpacity style={styles.uploadButton}>
+          <MaterialCommunityIcons name="camera" size={24} color={colors.text} />
+          <Text style={{ color: colors.text }}>Upload mídia</Text>
+        </TouchableOpacity>
+      </View>
+      
+      <TouchableOpacity style={styles.saveButton}>
+        <Text style={styles.saveButtonText}>Salvar</Text>
+      </TouchableOpacity>
+    </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  container: {
+    flex: 1,
+    padding: 16,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  titulo: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 24, // Ajustado para espaçamento maior
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  switchContainer: {
+    flexDirection: "row",
+    justifyContent: "space-evenly", // Alinhamento centralizado e espaçamento uniforme
+    marginBottom: 24, // Ajustado para maior separação
+  },
+  switchText: {
+    fontSize: 16,
+  },
+  inputContainer: {
+    marginBottom: 24, // Maior espaçamento entre os inputs e o botão de data
+  },
+  input: {
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingVertical: 12, // Padding vertical ajustado para maior área clicável
+    paddingHorizontal: 16, // Adicionado padding horizontal para melhor estética
+    marginBottom: 16, // Maior separação entre inputs
+  },
+  datePicker: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingVertical: 12, // Padding vertical ajustado
+    paddingHorizontal: 16, // Padding horizontal ajustado
+    borderWidth: 1,
+    borderRadius: 8,
+    marginBottom: 16, // Aumentado o espaçamento entre o DatePicker e o próximo item
+  },
+  uploadButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 12, // Padding vertical ajustado
+    paddingHorizontal: 16, // Padding horizontal ajustado
+    borderWidth: 1,
+    borderRadius: 8,
+    justifyContent: "center",
+    marginBottom: 16, // Ajustado para maior separação antes do botão de salvar
+  },
+  saveButton: {
+    backgroundColor: "#4A90E2",
+    paddingVertical: 16, // Padding vertical aumentado para um botão mais largo
+    paddingHorizontal: 32, // Padding horizontal aumentado
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  saveButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });
+
+export default NovaTransacao;

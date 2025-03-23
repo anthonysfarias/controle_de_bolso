@@ -19,8 +19,8 @@ type MaterialIcons = keyof typeof MaterialCommunityIcons.glyphMap;
 export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   const { colors, dark } = useTheme();
 
-  const backgroundColor = dark ? "#121212" : "#fff";
-  const activeColor = "#EF6C04";
+  const backgroundColor = dark ? "#18181C" : "#fff";
+  const corAtiva = dark ? "#ADF534" : "#FC4145";
   const inactiveColor = dark ? "#A1A1A1" : "#626262";
 
   return (
@@ -62,15 +62,19 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
             testID={options.tabBarButtonTestID}
             onPress={onPress}
             onLongPress={onLongPress}
-            style={[styles.tabItem, isPlus && styles.plusButton]}
+            style={[
+              styles.tabItem,
+              isPlus && { backgroundColor: corAtiva }, // Define background color for "plus" button
+              isPlus && styles.plusButton // Apply additional styles for "plus" button
+            ]}
           >
             <MaterialCommunityIcons
               name={icons[route.name as keyof typeof icons] as MaterialIcons}
               size={isPlus ? 24 : 20}
-              color={isPlus ? "#fff" : isFocused ? activeColor : inactiveColor}
+              color={isPlus ? "#fff" : isFocused ? corAtiva : inactiveColor}
             />
             {!isPlus && (
-              <Text style={[styles.label, { color: isFocused ? activeColor : colors.text }]}>
+              <Text style={[styles.label, { color: isFocused ? corAtiva : colors.text }]}>
                 {label}
               </Text>
             )}
@@ -80,6 +84,8 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
     </View>
   );
 }
+
+
 
 const styles = StyleSheet.create({
   container: {
@@ -102,7 +108,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   plusButton: {
-    backgroundColor: "#EF6C04",
     borderRadius: 10,
     height: 45,
     alignItems: "center",

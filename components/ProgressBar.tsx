@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Animated } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
-const ProgressBar = ({ progressValue }) => {
+const ProgressBar: React.FC<{ progressValue: number }> = ({ progressValue }) => {
   const { colors } = useTheme();
   const [progress, setProgress] = useState(new Animated.Value(0)); // Valor da animação
   const [progressText, setProgressText] = useState(0); // Texto para mostrar o progresso
@@ -46,7 +46,7 @@ const ProgressBar = ({ progressValue }) => {
         style={[styles.bar, { width: widthInterpolation, backgroundColor: colorInterpolation }]}
       />
       {/* Texto da barra de progresso */}
-      <Text style={[styles.text, { color: colors.text }]}>{`${progressText}%`}</Text>
+      <Text style={[styles.text, { color: "#000" }]}>{`${progressText}%`}</Text>
     </View>
   );
 };
