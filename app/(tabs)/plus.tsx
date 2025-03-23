@@ -175,6 +175,7 @@ const NovaTransacao = () => {
                 <Picker.Item label="Cartão de Crédito" value="credito" />
                 <Picker.Item label="Cartão de Débito" value="debito" />
                 <Picker.Item label="Transferência" value="transferencia" />
+                <Picker.Item label="PIX" value="pix" />
                 <Picker.Item label="Dinheiro" value="dinheiro" />
                 <Picker.Item label="Cheque" value="cheque" />
               </Picker>
