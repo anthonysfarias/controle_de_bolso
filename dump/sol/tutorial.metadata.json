@@ -1,0 +1,1 @@
+{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"},{"v":{"$numberInt":"2"},"key":{"screenLocation":{"$numberInt":"1"}},"name":"screenLocation_1","background":true,"unique":true}],"uuid":"adc618e8fb004ee092208f4f40de7dc6","collectionName":"tutorial","type":"collection"}
