@@ -15,6 +15,7 @@ import {
   CartaoTransacaoProps,
   Transacao,
 } from "../interfaces/indexTypes";
+import { LinearGradient } from "expo-linear-gradient";
 
 // Dados de transações
 const dadosTransacoes: Transacao[] = [
@@ -217,14 +218,12 @@ const TelaInicial: React.FC = () => {
       </View>
 
       {/* Cartão de Crédito */}
-      <View
-        style={[
-          estilos.cartao,
-          { backgroundColor: dark ? `${corAtiva}A1` : `${corAtiva}66` },
-          { borderColor: dark ? corAtiva : corAtiva },
-          { borderWidth: 1 },
-        ]}
-      >
+      <LinearGradient
+      colors={dark ? ["#16A085", "#769A3F"] : ["#ffb88e", "#c11e38"]}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      style={estilos.cartao}
+    >
         <Text style={[estilos.tituloCartao, { color: colors.text }]}>
           Dinheiro Restante
         </Text>
@@ -238,7 +237,7 @@ const TelaInicial: React.FC = () => {
         <Text style={[estilos.mensagemCartao, { color: colors.text }]}>
           Você gastou {gastoEstaSemana} até agora. Fique atento ao orçamento.
         </Text>
-      </View>
+      </LinearGradient>
 
       {/* Lista de Transações */}
       <View style={estilos.listaTransacoes}>
