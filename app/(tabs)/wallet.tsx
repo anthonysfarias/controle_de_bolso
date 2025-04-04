@@ -210,6 +210,7 @@ const styles = StyleSheet.create({
     flexDirection: "row", // Para distribuir os itens horizontalmente
     justifyContent: "space-between", // Espaçamento entre os itens
   },
+   
   infoItem: {
     flex: 1, // Permite que os itens se ajustem ao espaço disponível
     marginRight: 10, // Espaçamento entre os itens
